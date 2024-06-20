@@ -52,6 +52,7 @@ public class UserService {
     }
 
     public boolean comparePassword(String rawPassword,String encodedPassword){
+
         return passwordEncoder.matches(rawPassword,encodedPassword);
     }
     public boolean changePassword(Optional<User> optionalUser, String oldPassword, String newPassword) {
@@ -64,6 +65,4 @@ public class UserService {
         }
         return false;
     }
-
-
 }

@@ -1,6 +1,8 @@
 package org.example.shoe.controllers;
 
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import org.example.shoe.dto.UserDto;
 import org.example.shoe.entity.PasswordChangeRequest;
@@ -14,10 +16,11 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Optional;
+import java.util.UUID;
 
 
 @RestController
-@RequestMapping(path = "api/auth")
+@RequestMapping(path = "shoe/api/auth")
 public class AuthController {
     @Autowired
     EmailService emailService;
@@ -57,13 +60,18 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody UserDto userDto){
+    public ResponseEntity<?> login(@RequestBody UserDto userDto, HttpServletResponse response){
         User user = userService.findByEmail(userDto.getEmail());
         if(user!=null){
-            if(userService.comparePassword(user.getPassword(),userDto.getPassword())){
-                return ResponseEntity.ok("login successfully");
+            if(userService.comparePassword(userDto.getPassword(),user.getPassword())){
+                String token = UUID.randomUUID().toString();
+                Cookie cookie = new Cookie("token",token);
+                cookie.setPath("/shoe/api/auth/login");
+                cookie.setMaxAge(0);
+                response.addCookie(cookie);
+                return ResponseEntity.ok("successfully");
             }
-            return ResponseEntity.ok("Password sai");
+            return ResponseEntity.ok(" sai");
         }
         return ResponseEntity.ok("unsuccessfully");
     }
